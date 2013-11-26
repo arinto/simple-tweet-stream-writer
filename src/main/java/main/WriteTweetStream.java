@@ -1,19 +1,18 @@
 package main;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import listener.BasicStatusListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import listener.BasicStatusListener;
 import twitter4j.StatusListener;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import util.UpdateStatusRunnable;
-import writer.BasicWriter;
 
 public class WriteTweetStream {
 	
@@ -38,8 +37,8 @@ public class WriteTweetStream {
 		
 		TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
 		StatusListener statusListener = new BasicStatusListener();
-		
-		Runnable theRunnable = new BasicWriter(twitterStream, statusListener);
+		twitterStream.addListener(statusListener);
+		twitterStream.sample();
 		
 		Long init = Long.valueOf(0);
 		Runnable updateStatus = new UpdateStatusRunnable(init);
@@ -47,18 +46,14 @@ public class WriteTweetStream {
 		ScheduledExecutorService theScheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 		theScheduledExecutor.scheduleAtFixedRate(updateStatus, 0, 1, TimeUnit.SECONDS);
 		
-		ExecutorService theExecutor = Executors.newSingleThreadExecutor();
-		theExecutor.execute(theRunnable);
-		
 		try {
 			TimeUnit.MINUTES.sleep(duration);
 		} catch (InterruptedException e) {
 			logger.info("Interrupted!", e);
 		} finally{
 			twitterStream.cleanUp();
-			theExecutor.shutdown();
 			theScheduledExecutor.shutdown();
-			theExecutor.awaitTermination(10, TimeUnit.SECONDS);
+			theScheduledExecutor.awaitTermination(10, TimeUnit.SECONDS);
 		}
 
 	}
