@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+	<property name="APP_HOME" value="." />
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+   		<encoder>
+   			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    	<file>${APP_HOME}/log/${LOG_NAME}.log</file>
+    	<append>false</append>
+    		<!-- encoders are assigned the type
+         	ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    	<encoder>
+      		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    	</encoder>
+  </appender>
+  
+  	<appender name="WRITER" class="ch.qos.logback.core.FileAppender">
+    	<file>${APP_HOME}/log/${LOG_NAME}.txt</file>
+    	<append>false</append>
+    		<!-- encoders are assigned the type
+         	ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    	<encoder>
+      		<pattern>%msg%n</pattern>
+    	</encoder>
+  </appender>
+  
+  	<logger name="listener" level="info" >
+		<appender-ref ref="WRITER"/>
+  	</logger>
+  
+	
+	<root level="info">
+		<!-- appender-ref ref="STDOUT"/ -->
+		<appender-ref ref="FILE"/>
+	</root>
+</configuration>
+
